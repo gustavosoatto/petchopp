@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/screens/nfc_reading_screen.dart';
+import 'package:frontend/screens/qr_view_screen.dart';
 import '../models/user.dart';
 import '../services/api_service.dart';
 
@@ -11,6 +13,7 @@ class _UserListScreenState extends State<UserListScreen> {
   late Future<List<User>> _users;
   List<User> _filteredUsers = [];
   TextEditingController _searchController = TextEditingController();
+  bool _isSearching = false;
 
   @override
   void initState() {
@@ -26,11 +29,27 @@ class _UserListScreenState extends State<UserListScreen> {
   void _filterUsers(String query) {
     _users.then((users) {
       setState(() {
-        _filteredUsers = users
-            .where((user) =>
-                user.name.toLowerCase().contains(query.toLowerCase()) ||
-                user.email.toLowerCase().contains(query.toLowerCase()))
-            .toList();
+        if (query.isEmpty) {
+          _filteredUsers = users;
+          _isSearching = false;
+        } else {
+          _filteredUsers = users
+              .where((user) =>
+                  user.name.toLowerCase().contains(query.toLowerCase()) ||
+                  user.email.toLowerCase().contains(query.toLowerCase()))
+              .toList();
+          _isSearching = true;
+        }
+      });
+    });
+  }
+
+  void _clearSearch() {
+    _searchController.clear();
+    _users.then((users) {
+      setState(() {
+        _filteredUsers = users;
+        _isSearching = false;
       });
     });
   }
@@ -40,6 +59,13 @@ class _UserListScreenState extends State<UserListScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Registered Users'),
+        actions: [
+          if (_isSearching)
+            IconButton(
+              icon: Icon(Icons.clear),
+              onPressed: _clearSearch,
+            )
+        ],
       ),
       body: Column(
         children: [
@@ -59,14 +85,56 @@ class _UserListScreenState extends State<UserListScreen> {
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
               ElevatedButton(
-                onPressed: () {
-                  // TODO: Implement QR code search
+                onPressed: () async {
+                  final result = await Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => QRViewScreen()),
+                  );
+                  if (result != null) {
+                    _users.then((users) {
+                      final foundUser = users.firstWhere((user) => user.id.toString() == result, orElse: () => User(id: 0, name: '', email: ''));
+                      if (foundUser.id != 0) {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => CheckInScreen(user: foundUser),
+                          ),
+                        );
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text('User not found'),
+                          ),
+                        );
+                      }
+                    });
+                  }
                 },
                 child: Text('QR Code'),
               ),
               ElevatedButton(
-                onPressed: () {
-                  // TODO: Implement NFC search
+                onPressed: () async {
+                  final result = await Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => NfcReadingScreen()),
+                  );
+                  if (result != null) {
+                    _users.then((users) {
+                      final foundUser = users.where((user) => user.id.toString() == result);
+                      if (foundUser.isNotEmpty) {
+                        setState(() {
+                          _filteredUsers = foundUser.toList();
+                          _isSearching = true;
+                        });
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text('User not found'),
+                          ),
+                        );
+                      }
+                    });
+                  }
                 },
                 child: Text('NFC'),
               ),

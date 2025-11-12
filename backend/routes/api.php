@@ -9,6 +9,7 @@ Route::get('/test', function () {
 });
 
 Route::apiResource('users', UserController::class);
+Route::post('/users/{user}/check-in', [UserController::class, 'checkIn']);
 
 use App\Http\Controllers\NfcController;
 

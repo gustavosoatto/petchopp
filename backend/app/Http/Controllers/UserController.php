@@ -189,4 +189,12 @@ class UserController extends Controller
 
     return response()->json(null, 204);
   }
+
+  public function checkIn(User $user)
+  {
+    $user->entry_time = now();
+    $user->save();
+
+    return response()->json($user, 200);
+  }
 }
