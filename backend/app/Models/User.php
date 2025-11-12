@@ -37,6 +37,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'entry_code',
     ];
 
     /**
@@ -60,5 +61,28 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    public function eventEntries()
+    {
+        return $this->hasMany(EventEntry::class);
+    }
+
+    public function events()
+    {
+        return $this->belongsToMany(Event::class, 'event_entries')
+            ->withPivot('entry_time', 'entry_method', 'notes')
+            ->withTimestamps();
+    }
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::creating(function ($user) {
+            if (!$user->entry_code) {
+                $user->entry_code = strtoupper(substr(uniqid(), -8));
+            }
+        });
     }
 }
