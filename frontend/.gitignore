@@ -1,0 +1,45 @@
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+*.bak
+
+# Flutter/Dart/FVM
+.flutter_settings
+.dart_tool/
+.fvm/
+.packages
+build/
+*.iml
+
+# IDEs
+.idea/
+.vscode/
+
+# Local configuration
+local.properties
+
+# Dependency directories
+android/.gradle/
+android/app/.cxx/
+android/app/build/
+android/app/generated/
+ios/.symlinks/
+ios/.build/
+macos/Flutter/ephemeral/
+linux/flutter/ephemeral/
+windows/flutter/ephemeral/
+web/assets/assets/FontManifest.json
+web/assets/assets/AssetManifest.json
+web/assets/assets/NOTICES
+
+# Other
+*~
+*.log
+*.lock
+.env
+screenshots/

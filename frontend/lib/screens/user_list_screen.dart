@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/screens/nfc_reading_screen.dart';
 import 'package:frontend/screens/qr_view_screen.dart';
+import 'package:frontend/screens/check_in_screen.dart';
 import '../models/user.dart';
 import '../services/api_service.dart';
 
